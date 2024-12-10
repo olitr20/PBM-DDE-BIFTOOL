@@ -125,7 +125,7 @@ ym.subfield='l0';
 br_plot(branch1,xm,ym,'c');
 plot([0 5],[0 0],'-.');
 axis([0 5 -2 1.5]);
-xlabel('a21');ylabel('\Re\lambda');
+xlabel('theta_u');ylabel('\Re\lambda');
 % plot stability versus point number:
 figure(4); clf;
 br_plot(branch1,[],ym,'b');

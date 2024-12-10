@@ -59,7 +59,7 @@ figure(6); clf;
 [branch2,s,f,r]=br_contn(funcs,branch2,40);            % continue with plotting hopf branch:
 branch2=br_rvers(branch2);                             % reverse Hopf branch
 [branch2,s,f,r]=br_contn(funcs,branch2,30);            % continue in other direction
-xlabel('a21');ylabel('tau_s');
+xlabel('theta_u');ylabel('tau_s');
 %% Figure: Continuation (predictions and corrections) of Hopf bifurcation
 % Predictions and corrections in the $(a_{21},\tau_s)$-plane after
 % computation of a first branch of Hopf bifurcations.
