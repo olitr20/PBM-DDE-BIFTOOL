@@ -75,7 +75,7 @@ branch1.parameter
 branch1.parameter.min_bound
 % set bounds for continuation parameter
 branch1.parameter.min_bound(1,:)=[ind_theta_u 0];
-branch1.parameter.max_bound(1,:)=[ind_theta_u 5];
+branch1.parameter.max_bound(1,:)=[ind_theta_u 0.9];
 branch1.parameter.max_step(1,:)=[ind_theta_u 0.2];
 % use stst as a first branch point:
 branch1.point=stst;
@@ -87,7 +87,7 @@ branch1.point=stst;
 % $(x_1^*,x_2^*)=(0,0)$) we disable plotting during continuation by setting
 % the corresponding continuation method parameter to zero.
 
-stst.parameter(ind_theta_u)=stst.parameter(ind_theta_u)+0.1;
+stst.parameter(ind_theta_u)=stst.parameter(ind_theta_u)+0.01;
 [stst,success]=p_correc(funcs,stst,[],[],method.point)
 % use as a second branch point:
 branch1.point(2)=stst;
