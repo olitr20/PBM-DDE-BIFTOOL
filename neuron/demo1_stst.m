@@ -20,7 +20,7 @@
 % a_{21},\tau_1,\tau_2, \tau_s]$.
 p.alpha = 1; p.beta = 60;
 p.a = -1; p.b = -0.4; p.c = -1; p.d = 0;
-p.theta_u = 0.9; p.theta_v = 0.5;
+p.theta_u = 0.7; p.theta_v = 0.5;
 p.tau_1 = 0.2; p.tau_2 = p.tau_1;
 
 stst.kind='stst';
