@@ -27,9 +27,9 @@ stst.kind='stst';
 % stst.parameter=[p.alpha, p.beta, p.a, p.b, p.c, p.d, p.theta_u, p.theta_v, p.tau_1, p.tau_2];
 stst.parameter=[p.alpha, p.beta, p.a, p.b, p.c, p.d, p.theta_u, p.theta_v, p.tau_1];
 % stst.x=[0.103596478880629;1] % theta_u = 0.5
-% stst.x=[0.599328884047436;0] when theta_u = 0.6
-% stst.x=[0.698598941633828;0] when theta_u = 0.7
-% stst.x=[0.797713228634354;0] when theta_u = 0.8
+% stst.x=[0.599328884047436;0] % theta_u = 0.6
+% stst.x=[0.698598941633828;0] % theta_u = 0.7
+% stst.x=[0.797713228634354;0] % theta_u = 0.8
 stst.x=[0.896403521119372;0] % theta_u = 0.9
 
 %% Linear stability of initial equilibrium
