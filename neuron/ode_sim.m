@@ -5,7 +5,7 @@ p.a = -1; p.b = -0.4;
 p.c = -1; p.d = 0;
 
 % Find u* and v* such that θu = 0.4 & θv = 0.5
-p.theta_u = 0.5;
+p.theta_u = 0.7;
 p.theta_v = 0.5;
 
 biases = @(vars) [
