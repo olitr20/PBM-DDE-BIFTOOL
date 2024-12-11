@@ -56,9 +56,9 @@ hopf.parameter(ind_taus)=hopf.parameter(ind_taus)+0.01; % perturb hopf point
 [hopf,success]=p_correc(funcs,hopf,ind_theta_u,[],method.point); % correct hopf point, recompute stability
 branch2.point(2)=hopf;                                 % use as second point of hopf branch:
 figure(6); clf;
-[branch2,s,f,r]=br_contn(funcs,branch2,40);            % continue with plotting hopf branch:
+[branch2,s,f,r]=br_contn(funcs,branch2,1000);            % continue with plotting hopf branch:
 branch2=br_rvers(branch2);                             % reverse Hopf branch
-[branch2,s,f,r]=br_contn(funcs,branch2,30);            % continue in other direction
+[branch2,s,f,r]=br_contn(funcs,branch2,1000);            % continue in other direction
 xlabel('theta_u');ylabel('tau');
 %% Figure: Continuation (predictions and corrections) of Hopf bifurcation
 % Predictions and corrections in the $(a_{21},\tau_s)$-plane after
