@@ -65,14 +65,14 @@ p_splot(stst); % replot stability
 % $a_{21}$, limited by $a_{21}\in[0,5]$ and $\Delta a_{21}\leq 0.2$ between
 % points.
 
-% get an empty branch with ind_theta_u as a free parameter:
-branch1=df_brnch(funcs,ind_theta_u,'stst')
+% get an empty branch with ind_taus as a free parameter:
+branch1=df_brnch(funcs,ind_taus,'stst')
 branch1.parameter
 branch1.parameter.min_bound
 % set bounds for continuation parameter
-branch1.parameter.min_bound(1,:)=[ind_theta_u 0.4];
-branch1.parameter.max_bound(1,:)=[ind_theta_u 1];
-branch1.parameter.max_step(1,:)=[ind_theta_u 0.01];
+branch1.parameter.min_bound(1,:)=[ind_taus 0];
+branch1.parameter.max_bound(1,:)=[ind_taus 0.12];
+branch1.parameter.max_step(1,:)=[ind_taus 0.01];
 % use stst as a first branch point:
 branch1.point=stst;
 
@@ -83,14 +83,14 @@ branch1.point=stst;
 % $(x_1^*,x_2^*)=(0,0)$) we disable plotting during continuation by setting
 % the corresponding continuation method parameter to zero.
 
-stst.parameter(ind_theta_u)=stst.parameter(ind_theta_u)+0.01;
+stst.parameter(ind_taus)=stst.parameter(ind_taus)+0.001;
 [stst,success]=p_correc(funcs,stst,[],[],method.point)
 % use as a second branch point:
 branch1.point(2)=stst;
 branch1.method.continuation.plot=1;
 
 % continue in one direction:
- [branch1,s,f,r]=br_contn(funcs,branch1,100)
+[branch1,s,f,r]=br_contn(funcs,branch1,100)
 % turn the branch around:
 branch1=br_rvers(branch1);
 % continue in the other direction:
