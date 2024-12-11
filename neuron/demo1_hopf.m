@@ -48,12 +48,12 @@ p_splot(hopf);                     % plot stability of hopf point
 % an intermediate order reversal and a second call to |br_contn|.
 branch2=df_brnch(funcs,[ind_theta_u,ind_taus],'hopf'); % use hopf point as first point of hopf branch:
 branch2.parameter.min_bound(1,:)=[ind_theta_u 0.4];
-branch2.parameter.max_bound(1:2,:)=[[ind_theta_u 1]' [ind_taus 0.5]']';
+branch2.parameter.max_bound(1:2,:)=[[ind_theta_u 1]' [ind_taus 0.2]']';
 branch2.parameter.max_step(1:2,:)=[[ind_theta_u 0.01]' [ind_taus 0.01]']';
 branch2.point=hopf;
 
-hopf.parameter(ind_taus)=hopf.parameter(ind_taus)+0.01; % perturb hopf point
-[hopf,success]=p_correc(funcs,hopf,ind_theta_u,[],method.point); % correct hopf point, recompute stability
+hopf.parameter(ind_theta_u)=hopf.parameter(ind_theta_u)+0.01; % perturb hopf point
+[hopf,success]=p_correc(funcs,hopf,ind_taus,[],method.point); % correct hopf point, recompute stability
 branch2.point(2)=hopf;                                 % use as second point of hopf branch:
 figure(6); clf;
 [branch2,s,f,r]=br_contn(funcs,branch2,1000);            % continue with plotting hopf branch:
