@@ -87,7 +87,7 @@ stst.parameter(ind_theta_u)=stst.parameter(ind_theta_u)+0.01;
 [stst,success]=p_correc(funcs,stst,[],[],method.point)
 % use as a second branch point:
 branch1.point(2)=stst;
-branch1.method.continuation.plot=0;
+branch1.method.continuation.plot=1;
 
 % continue in one direction:
  [branch1,s,f,r]=br_contn(funcs,branch1,100)
