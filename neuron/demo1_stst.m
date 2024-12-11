@@ -21,7 +21,7 @@
 p.alpha = 1; p.beta = 60;
 p.a = -1; p.b = -0.4; p.c = -1; p.d = 0;
 p.theta_u = 0.7; p.theta_v = 0.5;
-p.tau_1 = 0.2; p.tau_2 = p.tau_1;
+p.tau_1 = 0; p.tau_2 = p.tau_1;
 
 stst.kind='stst';
 % stst.parameter=[p.alpha, p.beta, p.a, p.b, p.c, p.d, p.theta_u, p.theta_v, p.tau_1, p.tau_2];
@@ -72,7 +72,7 @@ branch1.parameter.min_bound
 % set bounds for continuation parameter
 branch1.parameter.min_bound(1,:)=[ind_taus 0];
 branch1.parameter.max_bound(1,:)=[ind_taus 0.1];
-branch1.parameter.max_step(1,:)=[ind_taus 0.01];
+branch1.parameter.max_step(1,:)=[ind_taus 0.001];
 % use stst as a first branch point:
 branch1.point=stst;
 
@@ -90,11 +90,11 @@ branch1.point(2)=stst;
 branch1.method.continuation.plot=1;
 
 % continue in one direction:
-[branch1,s,f,r]=br_contn(funcs,branch1,100)
+[branch1,s,f,r]=br_contn(funcs,branch1,200)
 % turn the branch around:
 branch1=br_rvers(branch1);
 % continue in the other direction:
-[branch1,s,f,r]=br_contn(funcs,branch1,100)
+[branch1,s,f,r]=br_contn(funcs,branch1,200)
 
 %% Stability of branch of equilibria
 % During continuation, sixteen points were successfully computed ($s=16$)
