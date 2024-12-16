@@ -12,25 +12,28 @@
 %% Add extension folder to path
 % The extension is installed in a separate folder. In addition, a folder
 % with utilities for user convenience is loaded.
-addpath('../../ddebiftool_extra_psol/');
-addpath('../../ddebiftool_utilities/');
+addpath('../ddebiftool_extra_psol/');
+addpath('../ddebiftool_utilities/');
 %#ok<*ASGLU,*NOPTS,*NASGU>
 %% Speed up computations by vectorization
 % The functions |neuron_sys_rhs| and |neuron_sys_deri| are
 % not vectorized. In order to speed up computations we re-define
 % |neuron_sys_rhs|, and replace |neuron_sys_seri| with the default
 % finite-difference approximation
+% neuron_sys_rhs=@(xx,par)[...
+%     -par(1)*xx(1,1,:)+par(2)*tanh(xx(1,4,:))+par(3)*tanh(xx(2,3,:));....
+%     -par(1)*xx(2,1,:)+par(2)*tanh(xx(2,4,:))+par(4)*tanh(xx(1,2,:))];
 neuron_sys_rhs=@(xx,par)[...
-    -par(1)*xx(1,1,:)+par(2)*tanh(xx(1,4,:))+par(3)*tanh(xx(2,3,:));....
-    -par(1)*xx(2,1,:)+par(2)*tanh(xx(2,4,:))+par(4)*tanh(xx(1,2,:))];
+    -xx(1,1,:)+1/(1+exp(-par(2)*(par(7)+par(3)*xx(1,2,:)+par(4)*xx(2,2,:))));....
+    par(1)*(-xx(2,1,:)+1/(1+exp(-par(2)*(par(8)+par(5)*xx(1,2,:)+par(6)*xx(2,2,:)))))];
 vfuncs=set_funcs(...
     'sys_rhs',neuron_sys_rhs,...
-    'sys_tau',@()[5,6,7],...
+    'sys_tau',@()9,...
     'x_vectorized',true);
 %% Find initial guess
 % For the branch computed in <demo1_psol.html> one fold occured at the
 % maximal parameter value. So we extract its index |indmax|. 
-[dummy,indmax]=max(arrayfun(@(x)x.parameter(ind_a21),branch5.point));
+[dummy,indmax]=max(arrayfun(@(x)x.parameter(ind_theta_u),branch5.point));
 
 %% Initialize branch and set up extended system
 % Then we call |SetupPOfold| to initialize the branch and to create the
@@ -60,19 +63,20 @@ vfuncs=set_funcs(...
 % structure: the output |FPObranch| inherits all fields from the input
 % |branch|. Additional name-value argument pairs canbe used to change
 % selected fields.
-[foldfuncs,branch7]=SetupPOfold(vfuncs,branch5,indmax,'contpar',[ind_a21,ind_taus],...
+branch5.method.point.newton_max_iterations=16;
+[foldfuncs,branch7]=SetupPOfold(vfuncs,branch5,indmax,'contpar',[ind_theta_u,ind_taus],...
     'dir',ind_taus,'print_residual_info',1,'step',0.01,'plot_measure',[],...
-    'min_bound',[ind_a21,0],'max_bound',[ind_a21,4; ind_taus,10],...
-    'max_step',[ind_a21,0.2; ind_taus,0.5]);
+    'min_bound',[ind_theta_u,0],'max_bound',[ind_theta_u,1; ind_taus,0.5],...
+    'max_step',[ind_theta_u,0.01; ind_taus,0.01]);
 %% Branch continuation
 % The output of |SetupPOfold| can be fed directly into |br_contn| to
 % perform a branch continuation. Note that the computation is typically
 % slower than a standard continuation of periodic orbits because the system
 % dimension is twice as large and additional delays have been introduced.
-figure(6);
+figure(13); clf;
 branch7.method.point.print_residual_info=0;
 branch7=br_contn(foldfuncs,branch7,100);
-xlabel('a21');ylabel('tau_s');
+xlabel('\theta_{u}');ylabel('\tau');
 title('Continuation of fold of periodic orbits');
 %% Extracting solution components
 % Since the fold continuation solves an extended system (with additional
@@ -96,9 +100,9 @@ pf_orbits=foldfuncs.get_comp(branch7.point,'solution');
     'exclude_trivial',true,'locate_trivial',@(x)[1,1]);
 fprintf('max number of unstable Floquet multipliers: %d\n',max(nunst_pf));
 n_orbits=length(pf_orbits);
-figure(16);
-a21_pfold=arrayfun(@(x)x.parameter(4),branch7.point);
-taus_pfold=arrayfun(@(x)x.parameter(7),branch7.point);
+figure(14);
+theta_u_pfold=arrayfun(@(x)x.parameter(7),branch7.point);
+taus_pfold=arrayfun(@(x)x.parameter(9),branch7.point);
 plot(1:n_orbits,triv_defect);
 xlabel('point number');
 ylabel('defect of trivial Floquet multiplier');

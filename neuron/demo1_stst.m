@@ -21,7 +21,7 @@
 p.alpha = 1; p.beta = 60;
 p.a = -1; p.b = -0.4; p.c = -1; p.d = 0;
 p.theta_u = 0.7; p.theta_v = 0.5;
-p.tau_1 = 0; p.tau_2 = p.tau_1;
+p.tau_1 = 0.2; p.tau_2 = p.tau_1;
 
 stst.kind='stst';
 % stst.parameter=[p.alpha, p.beta, p.a, p.b, p.c, p.d, p.theta_u, p.theta_v, p.tau_1, p.tau_2];
@@ -66,15 +66,16 @@ p_splot(stst); % replot stability
 % points.
 
 % get an empty branch with ind_taus as a free parameter:
-branch1=df_brnch(funcs,ind_taus,'stst')
-branch1.parameter
-branch1.parameter.min_bound
+branch1=df_brnch(funcs,ind_theta_u,'stst');
 % set bounds for continuation parameter
-branch1.parameter.min_bound(1,:)=[ind_taus 0];
-branch1.parameter.max_bound(1,:)=[ind_taus 0.5];
-branch1.parameter.max_step(1,:)=[ind_taus 0.001];
+branch1.parameter.min_bound(1,:)=[ind_theta_u 0.4];
+branch1.parameter.max_bound(1,:)=[ind_theta_u 1];
+branch1.parameter.max_step(1,:)=[ind_theta_u 0.005];
 % use stst as a first branch point:
 branch1.point=stst;
+
+branch1.parameter
+branch1.parameter.min_bound
 
 %%  Extend and continue branch of trivial equilibria
 % To obtain a second starting point we change  parameter value $a_{21}$
@@ -83,7 +84,9 @@ branch1.point=stst;
 % $(x_1^*,x_2^*)=(0,0)$) we disable plotting during continuation by setting
 % the corresponding continuation method parameter to zero.
 
-stst.parameter(ind_taus)=stst.parameter(ind_taus)+0.001;
+figure(3); clf;
+
+stst.parameter(ind_theta_u)=stst.parameter(ind_theta_u)+0.005;
 [stst,success]=p_correc(funcs,stst,[],[],method.point)
 % use as a second branch point:
 branch1.point(2)=stst;
@@ -95,6 +98,7 @@ branch1.method.continuation.plot=1;
 branch1=br_rvers(branch1);
 % continue in the other direction:
 [branch1,s,f,r]=br_contn(funcs,branch1,200)
+xlabel('\theta_{u}');ylabel('\tau');
 
 %% Stability of branch of equilibria
 % During continuation, sixteen points were successfully computed ($s=16$)
@@ -115,14 +119,7 @@ branch1=br_stabl(funcs,branch1,0,0);
 
 % obtain suitable scalar measures to plot stability along branch:
 [xm,ym]=df_measr(1,branch1)
-% plot branch 1 in tau
-% taub1 = zeros(length(branch1.point),1);
-% for i = 1:length(branch1.point)
-%     taub1(i) = branch1.point(i).parameter(9);
-% end
-figure(3); clf;
-br_plot(branch1,[],xm,'b');
-xlabel('point number along branch');ylabel('\Re(\lambda)');
+
 figure(4); clf;
 ym.subfield='l0';
 br_plot(branch1,[],ym,'b');

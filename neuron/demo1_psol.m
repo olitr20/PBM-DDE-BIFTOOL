@@ -25,7 +25,7 @@ degree=3;
 [psol,stepcond]=p_topsol(funcs,first_hopf,1e-2,degree,intervals);
 % correct periodic solution guess:
 method=df_mthod(funcs,'psol');
-[psol,success]=p_correc(funcs,psol,4,stepcond,method.point)
+[psol,success]=p_correc(funcs,psol,ind_theta_u,stepcond,method.point)
 
 %% Construction and continuation of branch
 % The result, along with a degenerate periodic solution with amplitude zero
@@ -36,10 +36,10 @@ method=df_mthod(funcs,'psol');
 % clearing of the mesh field is only  possible if it is already
 % equidistant. This is the case here as |p_topsol| returns a solution on an
 % equidistant mesh.
-branch4=df_brnch(funcs,ind_a21,'psol'); % empty branch:
-branch4.parameter.min_bound(1,:)=[ind_a21 0];
-branch4.parameter.max_bound(1,:)=[ind_a21 5];
-branch4.parameter.max_step(1,:)=[ind_a21 0.1];
+branch4=df_brnch(funcs,ind_theta_u,'psol'); % empty branch:
+branch4.parameter.min_bound(1,:)=[ind_theta_u 0];
+branch4.parameter.max_bound(1,:)=[ind_theta_u 0.84];
+branch4.parameter.max_step(1,:)=[ind_theta_u 0.005];
 % make degenerate periodic solution with amplitude zero at hopf point:
 deg_psol=p_topsol(funcs,first_hopf,0,degree,intervals);
 % use deg_psol and psol as first two points on branch:
@@ -47,9 +47,9 @@ deg_psol.mesh=[];
 branch4.point=deg_psol;
 psol.mesh=[];
 branch4.point(2)=psol;
-figure(9); clf;
-[branch4,s,f,r]=br_contn(funcs,branch4,50); % compute periodic solutions branch
-xlabel('a21');ylabel('amplitude');
+figure(7); clf;
+[branch4,s,f,r]=br_contn(funcs,branch4,500); % compute periodic solutions branch
+xlabel('\theta_{u}');ylabel('amplitude');
 %% Figure: family of periodic orbits
 % Branch of periodic solutions emanating from a Hopf point. The
 % branch turns at the far right.
@@ -63,7 +63,7 @@ xlabel('a21');ylabel('amplitude');
 % branch we could suspect a homoclinic or heteroclinic bifurcation
 % scenario.
 ll=length(branch4.point);
-figure(10); clf;
+figure(8); clf;
 subplot(3,1,1);
 p_pplot(branch4.point(ll-10));
 xlabel('t/period');ylabel(sprintf('x_1, x_2, point %d',ll-10));
@@ -73,14 +73,14 @@ xlabel('t/period');ylabel(sprintf('x_1, x_2, point %d',ll-5));
 subplot(3,1,3);
 p_pplot(branch4.point(ll-1));
 xlabel('t/period');ylabel(sprintf('x_1, x_2, point %d',ll-1));
-figure(11); clf;
+figure(9); clf;
 [xm,ym]=df_measr(0,branch4); 
 ym
 ym.field='period';
 ym.col=1;
 br_plot(branch4,xm,ym,'b');% look at the period along the branch:
-axis([2.2 2.36 20 170]);
-xlabel('a21');ylabel('period');
+axis([0.545 0.855 0.735 0.775]);
+xlabel('\theta_{u}');ylabel('period');
 %% Figures: Low accuracy solution profiles (top) and period (bottom) of periodic orbits
 % Three solution profiles using equidistant meshes (top), and period
 % (bottom) along the branch of periodic solutions.
@@ -88,16 +88,35 @@ xlabel('a21');ylabel('period');
 % We compute and plot the stability (Floquet multipliers) just before and
 % after the turning point. The second spectrum is clearly unstable but no
 % accurate trivial Floquet multiplier is present at 1.
-psol=branch4.point(ll-11);
+
+periods=arrayfun(@(x)x.period,branch4.point);
+thetas=arrayfun(@(x)x.parameter(7),branch4.point);
+
+[~, ind_p.ind1]=min(abs(periods-0.7467));
+[~, ind_p.ind2]=min(abs(periods-0.737645));
+[~, ind_p.ind3]=min(abs(periods-0.772474));
+[~, ind_p.ind4]=min(abs(periods-0.770443));
+[~, ind_p.ind5]=min(abs(periods-0.739588));
+[~, ind_p.ind6]=min(abs(periods-0.772476));
+[~, ind_p.ind7]=min(abs(periods-0.73765));
+[~, ind_p.ind8]=min(abs(periods-0.746483));
+
+% 1 -- 8
+% 2 -- 7
+% 3 -- 6
+% 4 -- 5
+
+psol=branch4.point(ind_p.ind1);
 psol.stability=p_stabil(funcs,psol,method.stability);
-figure(12); clf;
+figure(10); clf;
 subplot(2,1,1);
 p_splot(psol);
 axis image;
-psol=branch4.point(ll-8);
+psol=branch4.point(ind_p.ind2);
 psol.stability=p_stabil(funcs,psol,method.stability);
 subplot(2,1,2);
 p_splot(psol);
+axis image;
 %% Figures: Stability of periodic orbits at low accuracy
 % Floquet multipliers for a periodic solutions before (top) and just after
 % (bottom) the turning point visible in figure.
@@ -106,7 +125,7 @@ p_splot(psol);
 % reinterpolation and additional corrections) after correcting every point,
 % see figure. Increasing mesh sizes and using adaptive mesh selection also
 % improves the accuracy of the computed Floquet multipliers.
-psol=branch4.point(ll-12:ll-11); %refine these two points
+psol=branch4.point(ind_p.ind1:ind_p.ind1+1); %refine these two points
 intervals=40;
 degree=4;
 psol=arrayfun(@(p)p_remesh(p,degree,intervals),psol); % refine
@@ -120,18 +139,18 @@ branch5.method=method;
 [xm,ym]=df_measr(0,branch5);
 ym.field='period';
 ym.col=1;
-figure(11); axis auto; hold on;
+figure(11); clf; axis auto; hold on;
 branch5.method.continuation.plot_measure.x=xm;
 branch5.method.continuation.plot_measure.y=ym;
-[branch5,s,f,r]=br_contn(funcs,branch5,25);
-xlabel('a21');ylabel('period');
+[branch5,s,f,r]=br_contn(funcs,branch5,31); %31
+xlabel('\theta_{u}');ylabel('period');
 %% Homoclinic orbit
 % Plotting of a point clearly shows the (double) homoclinic nature of the
 % solutions. 
 %
 %<html><a name=longperiod></a></html>
 % 
-figure(13); clf;
+figure(12); clf;
 subplot(2,1,1);
 indmax0=length(branch5.point);
 psol=branch5.point(indmax0-6);
