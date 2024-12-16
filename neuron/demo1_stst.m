@@ -71,7 +71,7 @@ branch1.parameter
 branch1.parameter.min_bound
 % set bounds for continuation parameter
 branch1.parameter.min_bound(1,:)=[ind_taus 0];
-branch1.parameter.max_bound(1,:)=[ind_taus 0.1];
+branch1.parameter.max_bound(1,:)=[ind_taus 0.5];
 branch1.parameter.max_step(1,:)=[ind_taus 0.001];
 % use stst as a first branch point:
 branch1.point=stst;
@@ -115,18 +115,19 @@ branch1=br_stabl(funcs,branch1,0,0);
 
 % obtain suitable scalar measures to plot stability along branch:
 [xm,ym]=df_measr(1,branch1)
+% plot branch 1 in tau
+% taub1 = zeros(length(branch1.point),1);
+% for i = 1:length(branch1.point)
+%     taub1(i) = branch1.point(i).parameter(9);
+% end
 figure(3); clf;
-br_plot(branch1,xm,ym,'b'); % plot stability along branch:
-ym.subfield='l0';
-br_plot(branch1,xm,ym,'c');
-plot([0.4 1],[0 0],'-.');
-axis([0.4 1 -2 1.5]);
-xlabel('theta_u');ylabel('\Re\lambda');
-% plot stability versus point number:
+br_plot(branch1,[],xm,'b');
+xlabel('point number along branch');ylabel('\Re(\lambda)');
 figure(4); clf;
+ym.subfield='l0';
 br_plot(branch1,[],ym,'b');
 br_plot(branch1,[],ym,'b.');
-plot([0 30],[0 0],'-.');
+plot([0 250],[0 0],'-.');
 xlabel('point number along branch');ylabel('\Re(\lambda)');
 %% Figures: Stability of equilibria
 %
