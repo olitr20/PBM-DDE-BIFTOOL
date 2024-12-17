@@ -20,7 +20,7 @@
 % a_{21},\tau_1,\tau_2, \tau_s]$.
 p.alpha = 1; p.beta = 60;
 p.a = -1; p.b = -0.4; p.c = -1; p.d = 0;
-p.theta_u = 0.9; p.theta_v = 0.5;
+p.theta_u = 0.7; p.theta_v = 0.5;
 p.tau_1 = 0.2; p.tau_2 = p.tau_1;
 
 stst.kind='stst';
@@ -28,9 +28,9 @@ stst.kind='stst';
 stst.parameter=[p.alpha, p.beta, p.a, p.b, p.c, p.d, p.theta_u, p.theta_v, p.tau_1];
 % stst.x=[0.103596478880629;1] % theta_u = 0.5
 % stst.x=[0.599328884047436;0] % theta_u = 0.6
-% stst.x=[0.698598941633828;0] % theta_u = 0.7
+stst.x=[0.698598941633828;0] % theta_u = 0.7
 % stst.x=[0.797713228634354;0] % theta_u = 0.8
-stst.x=[0.896403521119372;0] % theta_u = 0.9
+% stst.x=[0.896403521119372;0] % theta_u = 0.9
 
 %% Linear stability of initial equilibrium
 % We get default point method parameters and correct the point, which,
@@ -65,16 +65,17 @@ p_splot(stst); % replot stability
 % $a_{21}$, limited by $a_{21}\in[0,5]$ and $\Delta a_{21}\leq 0.2$ between
 % points.
 
-% get an empty branch with ind_theta_u as a free parameter:
-branch1=df_brnch(funcs,ind_theta_u,'stst')
-branch1.parameter
-branch1.parameter.min_bound
+% get an empty branch with ind_taus as a free parameter:
+branch1=df_brnch(funcs,ind_theta_u,'stst');
 % set bounds for continuation parameter
 branch1.parameter.min_bound(1,:)=[ind_theta_u 0.4];
 branch1.parameter.max_bound(1,:)=[ind_theta_u 1];
-branch1.parameter.max_step(1,:)=[ind_theta_u 0.01];
+branch1.parameter.max_step(1,:)=[ind_theta_u 0.005];
 % use stst as a first branch point:
 branch1.point=stst;
+
+branch1.parameter
+branch1.parameter.min_bound
 
 %%  Extend and continue branch of trivial equilibria
 % To obtain a second starting point we change  parameter value $a_{21}$
@@ -83,18 +84,21 @@ branch1.point=stst;
 % $(x_1^*,x_2^*)=(0,0)$) we disable plotting during continuation by setting
 % the corresponding continuation method parameter to zero.
 
-stst.parameter(ind_theta_u)=stst.parameter(ind_theta_u)+0.01;
+figure(3); clf;
+
+stst.parameter(ind_theta_u)=stst.parameter(ind_theta_u)+0.005;
 [stst,success]=p_correc(funcs,stst,[],[],method.point)
 % use as a second branch point:
 branch1.point(2)=stst;
-branch1.method.continuation.plot=0;
+branch1.method.continuation.plot=1;
 
 % continue in one direction:
- [branch1,s,f,r]=br_contn(funcs,branch1,100)
+[branch1,s,f,r]=br_contn(funcs,branch1,200)
 % turn the branch around:
 branch1=br_rvers(branch1);
 % continue in the other direction:
-[branch1,s,f,r]=br_contn(funcs,branch1,100)
+[branch1,s,f,r]=br_contn(funcs,branch1,200)
+xlabel('\theta_{u}');ylabel('\tau');
 
 %% Stability of branch of equilibria
 % During continuation, sixteen points were successfully computed ($s=16$)
@@ -115,18 +119,12 @@ branch1=br_stabl(funcs,branch1,0,0);
 
 % obtain suitable scalar measures to plot stability along branch:
 [xm,ym]=df_measr(1,branch1)
-figure(3); clf;
-br_plot(branch1,xm,ym,'b'); % plot stability along branch:
-ym.subfield='l0';
-br_plot(branch1,xm,ym,'c');
-plot([0.4 1],[0 0],'-.');
-axis([0.4 1 -2 1.5]);
-xlabel('theta_u');ylabel('\Re\lambda');
-% plot stability versus point number:
+
 figure(4); clf;
+ym.subfield='l0';
 br_plot(branch1,[],ym,'b');
 br_plot(branch1,[],ym,'b.');
-plot([0 30],[0 0],'-.');
+plot([0 250],[0 0],'-.');
 xlabel('point number along branch');ylabel('\Re(\lambda)');
 %% Figures: Stability of equilibria
 %

@@ -49,105 +49,17 @@ p_splot(hopf);                     % plot stability of hopf point
 branch2=df_brnch(funcs,[ind_theta_u,ind_taus],'hopf'); % use hopf point as first point of hopf branch:
 branch2.parameter.min_bound(1,:)=[ind_theta_u 0.4];
 branch2.parameter.max_bound(1:2,:)=[[ind_theta_u 1]' [ind_taus 0.5]']';
-branch2.parameter.max_step(1:2,:)=[[ind_theta_u 0.01]' [ind_taus 0.01]']';
+branch2.parameter.max_step(1:2,:)=[[ind_theta_u 0.005]' [ind_taus 0.005]']';
 branch2.point=hopf;
 
-hopf.parameter(ind_taus)=hopf.parameter(ind_taus)+0.01; % perturb hopf point
-[hopf,success]=p_correc(funcs,hopf,ind_theta_u,[],method.point); % correct hopf point, recompute stability
+hopf.parameter(ind_theta_u)=hopf.parameter(ind_theta_u)-0.0001; % perturb hopf point
+[hopf,success]=p_correc(funcs,hopf,ind_taus,[],method.point); % correct hopf point, recompute stability
 branch2.point(2)=hopf;                                 % use as second point of hopf branch:
 figure(6); clf;
 [branch2,s,f,r]=br_contn(funcs,branch2,1000);            % continue with plotting hopf branch:
 branch2=br_rvers(branch2);                             % reverse Hopf branch
 [branch2,s,f,r]=br_contn(funcs,branch2,1000);            % continue in other direction
-xlabel('theta_u');ylabel('tau');
-%% Figure: Continuation (predictions and corrections) of Hopf bifurcation
-% Predictions and corrections in the $(a_{21},\tau_s)$-plane after
-% computation of a first branch of Hopf bifurcations.
-%% Hopf continuation and detecton of Takens-Bogdanov point
-% As we did not change continuation method parameters, predictions and
-% corrections will be plotted during continuation. The final result is
-% shown as figure. At the top, the branch hits the
-% boundary $\tau_s=10$. To the right, however, it seemingly turned back
-% onto itself. We compute and plot stability along the branch.
-branch2=br_stabl(funcs,branch2,0,0);
-figure(7); clf;
-[xm,ym]=df_measr(1,branch2); % plot stability versus point number:
-ym.subfield='l0';
-br_plot(branch2,[],ym,'c');
-ym.subfield='l1';
-br_plot(branch2,[],ym,'b');
-xlabel('point number along branch');ylabel('\Re(\lambda)');
-% plot omega to identify 'false' turning point
-% as Bogdanov-Takens point:
-figure(8); clf;
-[xm,ym]=df_measr(0,branch2);
-ym
-ym.field='omega';
-ym.col=1;
-xm
-xm.col=7;
-br_plot(branch2,xm,ym,'c');
-grid on;
-xlabel('tau');ylabel('Hopf frequency \omega');
-%% Figures: Stability and frequency along first Hopf bifurcation
-% Real part of characteristic roots along the first branch of Hopf bifurcations
-% (top). Bottom: The frequency of the Hopf bifurcation along the same branch.
-%% Comments
-% If, during these computations we would have obtained warnings of the
-% kind, |TIME_H warning: h_min is reached|, it would indicate that the time
-% integration step required to obtain good approximations to the requested
-% rightmost characteristic roots is too small. By default, characteristic
-% roots are computed up to $\Re(\lambda)\geq-1/\tau$.
-% We also notice a double Hopf point on the left but nothing special at the
-% right end, which could explain the observed turning of the branch.
-% Plotting the frequency $\omega$ versus $\tau_s$ reveals what has
-% happened, see figure. For small $\tau_s$, $\omega$ goes through zero,
-% indicating the presence of a Bogdanov-Takens point. The subsequent
-% turning is a recomputation of the same branch with negative frequencies.
-
-%% Switch to second Hopf bifurcation at double Hopf bifurcation
-% Selecting the double Hopf point we produce an approximation of the second
-% Hopf point.
-ind_hopf2=find(arrayfun(...
-    @(x)numel(x.stability.l0)>=5&&real(x.stability.l0(5))<-1e-4,branch2.point),...
-    1,'first');
-hopf2=p_tohopf(funcs,branch2.point(ind_hopf2));
-method.point.print_residual_info=1;
-[hopf,success]=p_correc(funcs,hopf2,ind_theta_u,[],method.point) %fails
-
-%% Changing the Newton iteration and correction with other system parameter
-% However, the correction fails. Printing residual information gives a list
-% of the Newton iteration number and the norm of the residual. This reveals
-% at least temporarily divergence of the correction process. Or we did not
-% allow enough Newton iterations, or the free parameter is not so
-% appropriate. We successfully try again using $\tau_s$ as a free
-% parameter.
-[hopf,success]=p_correc(funcs,hopf2,ind_taus,[],method.point) % should now work
-
-%% Continuation of second Hopf bifurcation
-% Using the second Hopf point we compute the intersecting branch of Hopf
-% points, depicted  below. Setting |plot_progress| to zero disables
-% intermediate plotting such that we see only the end result.
-branch3=df_brnch(funcs,[ind_theta_u,ind_taus],'hopf');
-branch3.parameter=branch2.parameter;
-branch3.point=hopf;
-% perturb and correct:
-hopf.parameter(ind_theta_u)=hopf.parameter(ind_theta_u)-0.05;
-method.point.print_residual_info=0; 
-format short;
-[hopf,success]=p_correc(funcs,hopf,ind_taus,[],method.point);
-branch3.point(2)=hopf; % use as second branch point:
-% continue branch of hopf points on two sides:
-branch3.method.continuation.plot_progress=0;
-figure(6);
-[branch3,s,f,r]=br_contn(funcs,branch3,100);
-% reverse branch
-branch3=br_rvers(branch3);
-[branch3,s,f,r]=br_contn(funcs,branch3,100);
-%% Figure: Continuation (predictions and corrections) of both Hopf bifurcations
-% Predictions and corrections in the $(a_{21},\tau_s)$-plane after
-% computation of second branch of Hopf bifurcations (superimposed on result
-% of first Hopf bifurcation).
+xlabel('\theta_{u}');ylabel('\tau');
 
 %% Save and continue 
 % Continue with with periodic orbits <demo1_psol.html> or normal forms
