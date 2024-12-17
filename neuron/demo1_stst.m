@@ -79,10 +79,7 @@ branch1.parameter.min_bound
 
 %%  Extend and continue branch of trivial equilibria
 % To obtain a second starting point we change  parameter value $a_{21}$
-% slightly and correct again.Because we know how the branch of steady state
-% solutions continued in $a_{21}$ looks like (it is constant at
-% $(x_1^*,x_2^*)=(0,0)$) we disable plotting during continuation by setting
-% the corresponding continuation method parameter to zero.
+% slightly and correct again.
 
 figure(3); clf;
 
@@ -98,7 +95,7 @@ branch1.method.continuation.plot=1;
 branch1=br_rvers(branch1);
 % continue in the other direction:
 [branch1,s,f,r]=br_contn(funcs,branch1,200)
-xlabel('\theta_{u}');ylabel('\tau');
+xlabel('\theta_{u}');ylabel('u');
 
 %% Stability of branch of equilibria
 % During continuation, sixteen points were successfully computed ($s=16$)

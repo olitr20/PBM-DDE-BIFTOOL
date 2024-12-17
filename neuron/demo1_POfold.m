@@ -33,7 +33,8 @@ vfuncs=set_funcs(...
 %% Find initial guess
 % For the branch computed in <demo1_psol.html> one fold occured at the
 % maximal parameter value. So we extract its index |indmax|. 
-[dummy,indmax]=max(arrayfun(@(x)x.parameter(ind_theta_u),branch5.point));
+[~,indmax1]=max(arrayfun(@(x)x.parameter(ind_theta_u),branch5.point));
+[~,indmax2]=min(arrayfun(@(x)x.parameter(ind_theta_u),branch5.point));
 
 %% Initialize branch and set up extended system
 % Then we call |SetupPOfold| to initialize the branch and to create the
@@ -64,9 +65,10 @@ vfuncs=set_funcs(...
 % |branch|. Additional name-value argument pairs canbe used to change
 % selected fields.
 branch5.method.point.newton_max_iterations=16;
-[foldfuncs,branch7]=SetupPOfold(vfuncs,branch5,indmax,'contpar',[ind_theta_u,ind_taus],...
+[foldfuncs,branch7]=SetupPOfold(vfuncs,branch5,indmax1,'contpar',[ind_theta_u,ind_taus],...
     'dir',ind_taus,'print_residual_info',1,'step',0.01,'plot_measure',[],...
-    'min_bound',[ind_theta_u,0],'max_bound',[ind_theta_u,1; ind_taus,0.5],...
+    'min_bound',[ind_theta_u,0.572535; ind_taus,0.102212], ...
+    'max_bound',[ind_theta_u,0.827663; ind_taus,0.5],...
     'max_step',[ind_theta_u,0.01; ind_taus,0.01]);
 %% Branch continuation
 % The output of |SetupPOfold| can be fed directly into |br_contn| to
@@ -76,8 +78,20 @@ branch5.method.point.newton_max_iterations=16;
 figure(13); clf;
 branch7.method.point.print_residual_info=0;
 branch7=br_contn(foldfuncs,branch7,100);
+branch7=br_rvers(branch7);
+branch7=br_contn(foldfuncs,branch7,100);
 xlabel('\theta_{u}');ylabel('\tau');
 title('Continuation of fold of periodic orbits');
+%% Initilaise and continue second periodic orbit branch
+[foldfuncs,branch8]=SetupPOfold(vfuncs,branch5,indmax2,'contpar',[ind_theta_u,ind_taus],...
+    'dir',ind_taus,'print_residual_info',1,'step',0.01,'plot_measure',[],...
+    'min_bound',[ind_theta_u,0.4; ind_taus,0.0], ...
+    'max_bound',[ind_theta_u,1.0; ind_taus,0.5],...
+    'max_step',[ind_theta_u,0.01; ind_taus,0.01]);
+branch8.method.point.print_residual_info=0;
+branch8=br_contn(foldfuncs,branch8,100);
+branch8=br_rvers(branch8);
+branch8=br_contn(foldfuncs,branch8,100);
 %% Extracting solution components
 % Since the fold continuation solves an extended system (with additional
 % components) it does not make sense to compute the linear stability of the
@@ -86,7 +100,8 @@ title('Continuation of fold of periodic orbits');
 % extended system that correspond to the solution of the original system.
 % The output of |get_comp| is an array of periodic orbits that are located
 % precisely on the fold. 
-pf_orbits=foldfuncs.get_comp(branch7.point,'solution');
+pf_orbits1=foldfuncs.get_comp(branch7.point,'solution');
+pf_orbits2=foldfuncs.get_comp(branch8.point,'solution');
 
 %% Stability of fold orbits
 % We compute Floquet multipliers for these orbits using the utility
@@ -96,15 +111,25 @@ pf_orbits=foldfuncs.get_comp(branch7.point,'solution');
 % trivial eigenvalues (as computed) to their correct values. |GetStability|
 % needs the optional input |'funcs'| if its first argument does not yet
 % have a stability structure.
-[nunst_pf,dom,triv_defect,pf_orbits]=GetStability(pf_orbits,'funcs',vfuncs,...
-    'exclude_trivial',true,'locate_trivial',@(x)[1,1]);
-fprintf('max number of unstable Floquet multipliers: %d\n',max(nunst_pf));
-n_orbits=length(pf_orbits);
+[~,~,~,pf_orbits1]=GetStability(pf_orbits1,'funcs',vfuncs);
+[~,~,~,pf_orbits2]=GetStability(pf_orbits2,'funcs',vfuncs);
+
+theta_u_pfold1=arrayfun(@(x)x.parameter(7),branch7.point);
+taus_pfold1=arrayfun(@(x)x.parameter(9),branch7.point);
+stability_pfold1=arrayfun(@(x)real(x.stability.mu(1)),pf_orbits1);
+
+theta_u_pfold2=arrayfun(@(x)x.parameter(7),branch8.point);
+taus_pfold2=arrayfun(@(x)x.parameter(9),branch8.point);
+stability_pfold2=arrayfun(@(x)real(x.stability.mu(1)),pf_orbits2);
+
 figure(14);
-theta_u_pfold=arrayfun(@(x)x.parameter(7),branch7.point);
-taus_pfold=arrayfun(@(x)x.parameter(9),branch7.point);
-plot(1:n_orbits,triv_defect);
-xlabel('point number');
-ylabel('defect of trivial Floquet multiplier');
+subplot(2,1,1)
+plot(theta_u_pfold1,stability_pfold1)
+xlabel('\theta_{u}');
+ylabel('Stability');
+subplot(2,1,2)
+plot(theta_u_pfold2,stability_pfold2)
+xlabel('\theta_{u}');
+ylabel('Stability');
 %% Save results (end of tutorial demo, but try also <demo1_hcli.html>)
 save('demo1_POfold_results.mat')
